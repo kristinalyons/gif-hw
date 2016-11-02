@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GifTastic</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Search What You Love!</h1>
+
+                
+        <div id="buttonsView"></div>
+
+        <form id="topic-form">
+            <label for="topic-input">Type something here!</label>
+            <input type="text" id="topic-input"><br>
+
+            <!-- Button triggers new topic to be added -->
+            <input id="addTopic" type="button" value="Click here to search!">
+        </form>
+
+        <div id="gifsAppearHere"></div>
+    </div>
+
+    <script src='http://code.jquery.com/jquery-2.1.3.min.js'></script>
+    <script type="text/javascript">
+
+
+        var myfaveTopics = ["seinfeld", "kittens", "prince", "martin"];
+
+    // need to make code for creating an array and having the array topics make buttons
+
+
+    function renderButtons(){ 
+
+        // Deletes the movies prior to adding new movies (this is necessary otherwise you will have repeat buttons)
+
+        $('#buttonsView').empty();
+
+        // Loops through the array of movies
+        for (var i = 0; i < myfaveTopics.length; i++){
+            // Then dynamicaly generates buttons for each movie in the array
+            // Note the jQUery syntax here... 
+            var a = $('<button>') // This code $('<button>') is all jQuery needs to create the beginning and end tag. (<button></button>)
+            a.addClass('myfaveTopics'); // Added a class 
+            a.attr('data-name', myfaveTopics[i]); // Added a data-attribute
+            a.text(myfaveTopics[i]); // Provided the initial button text
+            $('#buttonsView').append(a); // Added the button to the HTML
+        }
+    }
+    // This function handles events where one button is clicked
+    $('#addTopic').on('click', function(){
+               // This line of code will grab the input from the textbox
+        var newTopic = $('#topic-input').val().trim();
+        // The movie from the textbox is then added to our array
+        myfaveTopics.push(newTopic);
+        
+        // Our array then runs which handles the processing of our movie array
+        renderButtons();
+        // We have this line so that users can hit "enter" instead of clicking on ht button and it won't move to the next page
+        return false;
+    })
+
+    // make sure 'button' is sufficient once the above is coded
+    $('button').on('click', function() {
+        var topic = $(this).data('topic');
+        var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + topic + "&api_key=dc6zaTOxFJmzC&limit=10";
+        $.ajax({url: queryURL, method: 'GET'})
+
+        .done(function(response) {
+
+            var results = response.data;
+
+            for (var i = 0; i < results.length; i++) {
+
+                var topicDiv = $('<div>');
+                var p = $('<p>').text("Rating: " + results[i].rating);
+                var topicImage = $('<img>');
+                topicImage.attr('src', results[i].images.fixed_height.url);
+                topicDiv.append(p);
+                topicDiv.append(topicImage);
+                $('#gifsAppearHere').prepend(topicDiv);
+            }
+        });
+
+    });
+
+
+
+
+
+</script>
+</body>
+</html>
