@@ -6,11 +6,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Search What You Love!</h1>
+        <h1>Search For What You Love!</h1>
 
-                
+
         <div id="buttonsView"></div>
-
+        
         <form id="topic-form">
             <label for="topic-input">Type something here!</label>
             <input type="text" id="topic-input"><br>
@@ -28,22 +28,19 @@
 
         var myfaveTopics = ["seinfeld", "kittens", "prince", "martin"];
 
-    // need to make code for creating an array and having the array topics make buttons
+        renderButtons();
 
+        function renderButtons(){ 
 
-    function renderButtons(){ 
+            $('#buttonsView').empty();
 
-        // Deletes the movies prior to adding new movies (this is necessary otherwise you will have repeat buttons)
-
-        $('#buttonsView').empty();
-
-        // Loops through the array of movies
+        // Loops through the array of topics
         for (var i = 0; i < myfaveTopics.length; i++){
-            // Then dynamicaly generates buttons for each movie in the array
-            // Note the jQUery syntax here... 
-            var a = $('<button>') // This code $('<button>') is all jQuery needs to create the beginning and end tag. (<button></button>)
+            // Then generates buttons for each topic in the array
+            
+            var a = $('<button>');
             a.addClass('myfaveTopics'); // Added a class 
-            a.attr('data-name', myfaveTopics[i]); // Added a data-attribute
+            a.attr('data-topic', myfaveTopics[i]); // Added a data-attribute
             a.text(myfaveTopics[i]); // Provided the initial button text
             $('#buttonsView').append(a); // Added the button to the HTML
         }
@@ -51,7 +48,7 @@
     // This function handles events where one button is clicked
     $('#addTopic').on('click', function(){
                // This line of code will grab the input from the textbox
-        var newTopic = $('#topic-input').val().trim();
+               var newTopic = $('#topic-input').val().trim();
         // The movie from the textbox is then added to our array
         myfaveTopics.push(newTopic);
         
@@ -64,7 +61,9 @@
     // make sure 'button' is sufficient once the above is coded
     $('button').on('click', function() {
         var topic = $(this).data('topic');
+        console.log(topic);
         var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + topic + "&api_key=dc6zaTOxFJmzC&limit=10";
+
         $.ajax({url: queryURL, method: 'GET'})
 
         .done(function(response) {
@@ -75,12 +74,24 @@
 
                 var topicDiv = $('<div>');
                 var p = $('<p>').text("Rating: " + results[i].rating);
-                var topicImage = $('<img>');
+                var topicImage = $('<img class="gif">');
                 topicImage.attr('src', results[i].images.fixed_height.url);
                 topicDiv.append(p);
                 topicDiv.append(topicImage);
                 $('#gifsAppearHere').prepend(topicDiv);
             }
+
+            $('.gif').on('click', function(){
+                var state = $(this).attr('data-state');
+                if ( state == 'still'){
+                    $(this).attr('src', $(this).data('animate'));
+                    $(this).attr('data-state', 'animate');
+                }
+                else{
+                    $(this).attr('src', $(this).data('still'));
+                    $(this).attr('data-state', 'still');
+                }
+            });
         });
 
     });
